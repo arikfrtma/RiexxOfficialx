@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Riexx</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 24px;
+            color: var(--secondary);
+        }
+        
+        .content {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .password-section, .main-section {
+            display: none;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        .number-preview {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .github-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .github-info a {
+            color: var(--secondary);
+            text-decoration: none;
+        }
+        
+        .github-info a:hover {
+            text-decoration: underline;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--success);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .number-list {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .number-item {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .number-item:last-child {
+            border-bottom: none;
+        }
+        
+        .number-item span {
+            font-family: monospace;
+        }
+        
+        .number-item .delete {
+            color: var(--accent);
+            cursor: pointer;
+        }
+        
+        @media (max-width: 576px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-database"></i>
+            </div>
+            <h1>Database Riexx</h1>
+            <p>Simpan dan kelola nomor telepon dengan aman</p>
+        </div>
+        
+        <div class="content">
+            <div class="password-section active" id="passwordSection">
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> Masukkan Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Kata sandi akses database">
+                </div>
+                <button class="btn" id="loginBtn">Akses Database</button>
+                
+                <div class="github-info">
+                    <p>Data akan disimpan ke <a href="https://github.com" target="_blank">GitHub Repository</a></p>
+                </div>
+            </div>
+            
+            <div class="main-section" id="mainSection">
+                <div class="form-group">
+                    <label for="phoneNumber"><i class="fas fa-phone"></i> Masukkan Nomor Telepon</label>
+                    <div style="display: flex;">
+                        <span style="padding: 12px 15px; background: #eee; border: 2px solid #ddd; border-right: none; border-radius: 8px 0 0 8px;">+62</span>
+                        <input type="text" id="phoneNumber" class="form-control" placeholder="8123456789" style="border-radius: 0 8px 8px 0;">
+                    </div>
+                </div>
+                
+                <button class="btn" id="addNumberBtn">
+                    <i class="fas fa-plus-circle"></i> Tambahkan ke Database
+                </button>
+                
+                <div class="number-preview">
+                    Nomor lengkap: <span id="fullNumber">+62</span>
+                </div>
+                
+                <div class="number-list" id="numberList">
+                    <div class="number-item">
+                        <span>+6283179572446</span>
+                        <span class="delete"><i class="fas fa-trash"></i></span>
+                    </div>
+                    <div class="number-item">
+                        <span>+6283898472764</span>
+                        <span class="delete"><i class="fas fa-trash"></i></span>
+                    </div>
+                </div>
+                
+                <div class="github-info">
+                    <p><i class="fab fa-github"></i> Data tersimpan di: <a href="#" id="githubLink" target="_blank">https://github.com/riexx/database</a></p>
+                </div>
+                
+                <button class="btn" id="logoutBtn" style="background: var(--accent); margin-top: 20px;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i> <span id="notificationText">Nomor berhasil ditambahkan!</span>
+    </div>
+
+    <script>
+        // Password untuk mengakses aplikasi
+        const APP_PASSWORD = "RiexxCrash";
+        
+        // Elemen DOM
+        const passwordSection = document.getElementById('passwordSection');
+        const mainSection = document.getElementById('mainSection');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const phoneInput = document.getElementById('phoneNumber');
+        const addNumberBtn = document.getElementById('addNumberBtn');
+        const fullNumberSpan = document.getElementById('fullNumber');
+        const numberList = document.getElementById('numberList');
+        const githubLink = document.getElementById('githubLink');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        
+        // URL GitHub (contoh)
+        const GITHUB_REPO_URL = "https://github.com/arikfrtma/Databaseeh/raw/refs/heads/main/whitelist.json";
+        githubLink.href = GITHUB_REPO_URL;
+        
+        // Event listener untuk login
+        loginBtn.addEventListener('click', function() {
+            if (passwordInput.value === APP_PASSWORD) {
+                passwordSection.classList.remove('active');
+                mainSection.classList.add('active');
+                showNotification('Berhasil login! Selamat datang di Database Riexx.');
+            } else {
+                showNotification('Password salah! Silakan coba lagi.', 'error');
+                passwordInput.value = '';
+            }
+        });
+        
+        // Event listener untuk input nomor telepon
+        phoneInput.addEventListener('input', function() {
+            const number = phoneInput.value.replace(/\D/g, '');
+            phoneInput.value = number;
+            fullNumberSpan.textContent = '+62' + number;
+        });
+        
+        // Event listener untuk menambahkan nomor
+        addNumberBtn.addEventListener('click', function() {
+            const number = phoneInput.value;
+            if (number.length < 9) {
+                showNotification('Nomor telepon terlalu pendek!', 'error');
+                return;
+            }
+            
+            const fullNumber = '+62' + number;
+            
+            // Simulasikan penyimpanan ke GitHub
+            simulateAddToGitHub(fullNumber);
+            
+            // Tambahkan ke daftar
+            addNumberToList(fullNumber);
+            
+            // Reset input
+            phoneInput.value = '';
+            fullNumberSpan.textContent = '+62';
+            
+            showNotification('Nomor ' + fullNumber + ' berhasil ditambahkan ke database!');
+        });
+        
+        // Event listener untuk logout
+        logoutBtn.addEventListener('click', function() {
+            passwordSection.classList.add('active');
+            mainSection.classList.remove('active');
+            passwordInput.value = '';
+            showNotification('Anda telah logout dari sistem.');
+        });
+        
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification(message, type = 'success') {
+            notificationText.textContent = message;
+            
+            if (type === 'error') {
+                notification.style.background = '#e74c3c';
+            } else {
+                notification.style.background = '#2ecc71';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(function() {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Fungsi untuk mensimulasikan penambahan ke GitHub
+        function simulateAddToGitHub(number) {
+            console.log('Menyimpan nomor ' + number + ' ke GitHub...');
+            // Di aplikasi nyata, di sini akan ada kode untuk mengirim data ke GitHub API
+        }
+        
+        // Fungsi untuk menambahkan nomor ke daftar
+        function addNumberToList(number) {
+            const numberItem = document.createElement('div');
+            numberItem.className = 'number-item';
+            numberItem.innerHTML = `
+                <span>${number}</span>
+                <span class="delete"><i class="fas fa-trash"></i></span>
+            `;
+            
+            // Tambahkan event listener untuk hapus
+            numberItem.querySelector('.delete').addEventListener('click', function() {
+                numberItem.remove();
+                showNotification('Nomor ' + number + ' dihapus dari daftar.');
+            });
+            
+            numberList.appendChild(numberItem);
+        }
+        
+        // Event listener untuk menghapus nomor yang sudah ada
+        document.querySelectorAll('.number-item .delete').forEach(function(deleteBtn) {
+            deleteBtn.addEventListener('click', function() {
+                const numberItem = this.parentElement;
+                const number = numberItem.querySelector('span').textContent;
+                numberItem.remove();
+                showNotification('Nomor ' + number + ' dihapus dari daftar.');
+            });
+        });
+    </script>
+</body>
+</html>
